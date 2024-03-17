@@ -1,28 +1,19 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, filters
+import os
 
-# Define a function to handle the /start command
-def start(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Hello! I'm your simple Telegram bot.")
+import telebot
 
-# Define a function to handle normal messages
-def echo(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text=update.message.text)
+BOT_TOKEN = "7160785140:AAHj-EdLG72nSdOtAmaP5SHzFdHF86RgIWg"
 
-def main():
-    # Create an Updater and pass your bot's token
-    updater = Updater("7160785140:AAHj-EdLG72nSdOtAmaP5SHzFdHF86RgIWg")
+bot = telebot.TeleBot(BOT_TOKEN)
+@bot.message_handler(commands=['start', 'hello'])
+def send_welcome(message):
+    bot.reply_to(message, "Howdy, how are you doing?")
 
-    # Get the dispatcher
-    dp = updater.dispatcher
 
-    # Register command handlers
-    dp.add_handler(CommandHandler("start", start))
+@bot.message_handler(func=lambda msg: True)
+def echo_all(message):
+    bot.reply_to(message, message.text)
 
-    # Register a message handler for all messages
-    dp.add_handler(MessageHandler(filters.text & ~filters.command, echo))
-
-    # Start the Bot
-    updater.start_polling()
-
+bot.infinity_polling()
    
 
