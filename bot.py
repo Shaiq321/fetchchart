@@ -1,40 +1,28 @@
-import cv2
-import pytesseract
-from telegram.ext import Updater, MessageHandler, filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, filters
 
-# Function to detect text with a black background color from an image
-def detect_text(update, context):
-    # Get the image file from the message
-    photo = update.message.photo[-1].get_file()
-    # Download the image file
-    photo.download('input_image.jpg')
+# Define a function to handle the /start command
+def start(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Hello! I'm your simple Telegram bot.")
 
-    # Read the image
-    image = cv2.imread('input_image.jpg')
-
-    # Convert the image to grayscale
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-    # Apply thresholding to create a binary image
-    _, binary_image = cv2.threshold(gray_image, 127, 255, cv2.THRESH_BINARY)
-
-    # Use pytesseract to extract text
-    detected_text = pytesseract.image_to_string(binary_image)
-
-    # Send the detected text back to the user
-    update.message.reply_text("Detected Text:\n" + detected_text)
+# Define a function to handle normal messages
+def echo(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text=update.message.text)
 
 def main():
-    # Initialize the Telegram bot
-    updater = Updater("7160785140:AAHj-EdLG72nSdOtAmaP5SHzFdHF86RgIWg", use_context=True)
+    # Create an Updater and pass your bot's token
+    updater = Updater("7160785140:AAHj-EdLG72nSdOtAmaP5SHzFdHF86RgIWg")
+
+    # Get the dispatcher
     dp = updater.dispatcher
 
-    # Handle photo messages
-    dp.add_handler(MessageHandler(filters.photo, detect_text))
+    # Register command handlers
+    dp.add_handler(CommandHandler("start", start))
 
-    # Start the bot
+    # Register a message handler for all messages
+    dp.add_handler(MessageHandler(filters.text & ~filters.command, echo))
+
+    # Start the Bot
     updater.start_polling()
-    updater.idle()
 
-if __name__ == '__main__':
-    main()
+   
+
